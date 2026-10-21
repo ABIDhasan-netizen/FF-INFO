@@ -4,10 +4,10 @@ const { FreeFireAPI } = require('shan-ffapi');
 const app = express();
 const api = new FreeFireAPI();
 
-// গুরুত্বপূর্ণ: static মিডলওয়্যার যোগ করুন, public ফোল্ডারের HTML পৃষ্ঠা পরিবেশন করুন
+// গুরুত্বপূর্ণ: public ফোল্ডারের স্ট্যাটিক ফাইল পরিবেশন করুন, যাতে / অ্যাক্সেস করলে index.html লোড হয়
 app.use(express.static('public'));
 
-// API রুট অপরিবর্তিত
+// API রুট: UID দিয়ে প্লেয়ার তথ্য জিজ্ঞাসা
 app.get('/api/player/:uid', async (req, res) => {
   const uid = req.params.uid;
 
@@ -20,17 +20,14 @@ app.get('/api/player/:uid', async (req, res) => {
     const basic = profile.basicinfo || {};
     const social = profile.socialinfo || {};
 
-    const result = {
+    res.json({
       uid: uid,
       nickname: basic.nickname || 'অজানা',
       level: basic.level || 0,
       likes: social.liked || 0,
       region: basic.region || 'অজানা',
-      rank: basic.rank || 0,
       raw: profile
-    };
-
-    res.json(result);
+    });
   } catch (err) {
     console.error('ত্রুটি:', err.message);
     res.status(500).json({ error: 'তথ্য পাওয়া যায়নি, UID সঠিক কিনা বা লাইব্রেরি আপডেট হয়েছে কিনা দেখুন' });
